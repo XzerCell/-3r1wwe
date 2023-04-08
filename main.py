@@ -1,15 +1,17 @@
+#from settings import settings
 import discord
+from discord.ext import commands
+
 import random
+# import * - это тоже самое, что перечислить все файлы
+#from bot_logic import *
+
 # Переменная intents - хранит привилегии бота
 intents = discord.Intents.default()
 # Включаем привелегию на чтение сообщений
 intents.message_content = True
 # Создаем бота в переменной client и передаем все привелегии
-client = discord.Client(intents=intents)
-
-@client.event
-async def on_ready():
-    print(f'We have logged in as {client.user}')
+bot = commands.Bot(command_prefix='$', intents=intents)
 
 def gen_pass(pass_length):
     elements = "+-/*!&$#?=@<>"
@@ -32,22 +34,29 @@ def flip_coin():
         return "ОРЕЛ"
     else:
         return "РЕШКА"
+    
+# Когда бот будет готов, он напишет в консоли свое название!
+@bot.event
+async def on_ready():
+    print(f'We have logged in as {bot.user}')
 
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    if message.content.startswith('$hello'):
-        await message.channel.send('Привет! Я бот!')
-    elif message.content.startswith('$smile'):
-        await message.channel.send(gen_emodji())
-    elif message.content.startswith('$coin'):
-        await message.channel.send(flip_coin())
-    elif message.content.startswith('$pass'):
-        await message.channel.send(gen_pass(10))
-    else:
-        await message.channel.send("Я не понимаю такую команду!")
+@bot.command()
+async def hello(ctx):
+    await ctx.send(f'Привет! Я бот {bot.user}!')
+
+@bot.command()
+async def smile(ctx):
+    await ctx.send(gen_emodji())
+
+@bot.command()
+async def coin(ctx):
+    await ctx.send(flip_coin())
+
+@bot.command()
+async def password(ctx, count = 10):
+    await ctx.send(gen_pass(count))
 
 
 
-client.run("MTA5MTc4MDY3NDAzNTM5Njc1MA.G3ZpMg.aGy9XtRv5pcKk7Ty8CGWEY0UexHOE8QH7fYq5E")
+
+bot.run("MTA5MTc4MDY3NDAzNTM5Njc1MA.GGP08G.s3KyV7s5RrHINV-4Yce7u3PUc0I7PB3ZmsKntg")
